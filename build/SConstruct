@@ -1,0 +1,54 @@
+# sconstruct template
+# extended by python functions
+# with python, it can add source code scanner.
+
+# uses:
+# 1. manual for parameters with ARGUMENTS
+# 2. -c to cleanup
+# 3. *.c to compile selected files
+# 4. --tree=all to show the dependency graph
+# 5. --debug=explain to tell the reason why SCons believe a out-of-date file
+
+# Variables:
+# `$CC -o $TARGET -c $CFLAGS $CCFLAGS $_CCCOMCOM $SOURCES`
+# CC = gcc
+# CCVERSION = 4.3.2
+# CFILESUFFIX = .c
+# PROGSUFFIX = (empty at Unix, .exe at Windows)
+# CCCOM = compliers
+# CCFLAGS = [-options] both C and C++
+# CFLAGS = [-options] only C
+# CPPDEFINES = a list of C preprocessor symbols
+# CPPPATH = the list of directories to search #include
+# LIBPATH = the list of directories to link library
+# CCCOMSTR = display specified message
+
+# Functions:
+# Variables() -> configure the variables
+# Builder(action='shell command') -> execute the shell command action with builder
+# Command(outfile, infile, 'command') -> used to archive files
+# Scanner(function='*', skeys=['*.*']) -> add a scanner
+# SConscript('subdir/SConscript') -> execute the subdirectories with subdir/SConscript
+# Depends(target, 'headers.h') -> find dependencies
+# Ignore(target, 'calc.o') -> remove a link
+# Default('calculator') -> override
+# Alias('all', 'calculator') -> alias
+# Decider('MD5') -> determine changed by md5
+# Decider('timestamp-newer') -> determine changed by timestamp-newer
+# Decider('timestamp-match') -> determine changed by timestamp-match
+# Decider('MD5-timestamp') -> determine changed by MD5-timestamp
+
+# Used by multiple SConstruct file:
+# Import(env) / Export(env) -> use environment configure
+# Return(env) -> return the env
+
+env = Environment()
+
+if ARGUMENTS.get('version', 0):
+    env.Program('calculator', ['calc.c', 'add.c', 'mult.c', 'sub.c'])
+elif ARGUMENTS.get('version', 'static'):
+    myCalLib = StaticLibrary('libclac', ['add.c', 'sub.c', 'mult.c'])
+    env.Program('calculator', ['calc.c'], LIBS=[myCalLib], CFLAGS='-g')
+elif ARGUMENTS.get('version', 'dynamic'):
+    myCalLib = SharedLibrary('libclac', ['add.c', 'sub.c', 'mult.c'])
+    env.Program('calculator', ['calc.c'], LIBS=[myCalLib], CFLAGS='-g')
